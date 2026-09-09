@@ -2,6 +2,7 @@
 #include <stdio.h>
 // Inclui os tipos e as funcoes usadas para gerenciar processos.
 #include "processos/processos.h"
+#include "escalonador/escalonador.h"
 
 // Funcao principal: e o ponto de entrada da execucao do programa.
 int main(){
