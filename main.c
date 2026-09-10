@@ -6,6 +6,11 @@
 
 // Funcao principal: e o ponto de entrada da execucao do programa.
 int main(){
+    Fila_escalonador_Prontos fila;
+    inicializar_fila(&fila);
+
+
+
     // Inicializa todas as posicoes da tabela como livres.
     inicializar_Processos();
     // Procura e exibe a primeira posicao livre antes das criacoes.
@@ -16,6 +21,20 @@ int main(){
     criar_Processo("Processo 2", 3, 300.0);
     // Cria um terceiro processo com os valores informados.
     criar_Processo("Processo 3", 8, 700.0);
+
+
+    // Adiciona os processos criados a fila de prontos.
+    adicionar_fila(&fila, 1);
+    adicionar_fila(&fila, 2);
+    adicionar_fila(&fila, 3);
+
+    // Retira o primeiro processo da fila.
+    int PID_retirado = remover_fila(&fila);
+
+    // Mostra qual PID foi retirado.
+    printf("PID retirado da fila: %d\n", PID_retirado);
+
+
     // Exibe todos os processos atualmente ocupados.
     listar_Processos();
     // Procura e exibe a proxima posicao livre depois das criacoes.

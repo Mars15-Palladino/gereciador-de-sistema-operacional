@@ -1,7 +1,7 @@
 #include"escalonador.h"
 
 
-void inicializar_Fila(Fila_escalonador_Prontos *fila){
+void inicializar_fila(Fila_escalonador_Prontos *fila){
     fila->inicio = 0;
     fila->fim = 0;
     fila->quantidade = 0;
@@ -11,7 +11,7 @@ int adicionar_fila(Fila_escalonador_Prontos *fila, int PID){
         return -1;
     }
     fila->PIDs[fila->fim] = PID;
-    fila->fim++;
+    fila->fim = (fila->fim+1)%TAMANHO_FILA;;
     fila->quantidade++;
 }
 
@@ -20,7 +20,7 @@ int remover_fila(Fila_escalonador_Prontos *fila){
         return -1;
     }
     int PID = fila->PIDs[fila->inicio];
-    fila->inicio++;
+    fila->inicio = (fila->inicio+1)%TAMANHO_FILA;
     fila->quantidade++;
 
     return PID;

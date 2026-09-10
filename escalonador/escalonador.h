@@ -13,7 +13,7 @@ typedef struct Fila_escalonador_Prontos{
     
 }Fila_escalonador_Prontos;
 
-void inicializar_Fila(Fila_escalonador_Prontos *fila);
+void inicializar_fila(Fila_escalonador_Prontos *fila);
 
 int adicionar_fila(Fila_escalonador_Prontos *fila, int PID);
 int remover_fila(Fila_escalonador_Prontos *fila);
