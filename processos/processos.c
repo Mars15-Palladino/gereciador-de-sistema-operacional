@@ -129,3 +129,48 @@ int finalizar_Processo(int PID){
     // Retorna -1 para indicar que a finalizacao nao foi realizada.
     return -1;
 }
+
+// Altera o estado de um processo pelo PID informado.
+int alterar_estado_do_processo(int PID, EstadoProcesso novo_estado){
+
+    // Percorre todas as posições da tabela de processos.
+    for(int i = 0; i < MAX_processos; i++){
+
+        // Verifica se a posição está ocupada e possui o PID procurado.
+        if(processos[i].ocupado && processos[i].PID == PID){
+
+            // Altera o estado do processo.
+            processos[i].estado = novo_estado;
+
+            // Retorna zero para indicar sucesso.
+            return 0;
+        }
+    }
+
+    // Retorna -1 caso o PID não seja encontrado.
+    return -1;
+}
+int processo_terminado(int PID){
+    for(int i = 0; i < MAX_processos; i++){
+        if(processos[i].PID == PID){
+            if(processos[i].estado == TERMINADO){
+                return 1;
+            }
+
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+int quantidade_processos_ativos(void){
+    int quantidade = 0;
+
+    for(int i = 0;i<MAX_processos;i++){
+        if(processos[i].ocupado){
+            quantidade++;
+        }
+    }
+    return quantidade;
+}

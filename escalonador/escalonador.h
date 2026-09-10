@@ -2,6 +2,7 @@
 #define ESCALONADOR_
 
 #define TAMANHO_FILA 250
+#define QUANTUN 100.0   
 
 /*Criação da estrutura da fila*/
 typedef struct Fila_escalonador_Prontos{
@@ -17,6 +18,8 @@ void inicializar_fila(Fila_escalonador_Prontos *fila);
 
 int adicionar_fila(Fila_escalonador_Prontos *fila, int PID);
 int remover_fila(Fila_escalonador_Prontos *fila);
+int atualizar_estado_fila(int PID);
+int executar_quantum(int PID);
 
 
 

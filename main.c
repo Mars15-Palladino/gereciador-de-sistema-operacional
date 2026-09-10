@@ -22,19 +22,31 @@ int main(){
     // Cria um terceiro processo com os valores informados.
     criar_Processo("Processo 3", 8, 700.0);
 
+    printf("Processos ativos: %d\n", quantidade_processos_ativos());
 
     // Adiciona os processos criados a fila de prontos.
     adicionar_fila(&fila, 1);
     adicionar_fila(&fila, 2);
     adicionar_fila(&fila, 3);
 
-    // Retira o primeiro processo da fila.
-    int PID_retirado = remover_fila(&fila);
+    
+    while(quantidade_processos_ativos()>0){
+        // Retira o primeiro processo da fila.
+        int PID_retirado = remover_fila(&fila);
+        // Mostra qual PID foi retirado.
+        printf("PID retirado da fila: %d\n", PID_retirado);
 
-    // Mostra qual PID foi retirado.
-    printf("PID retirado da fila: %d\n", PID_retirado);
+        
 
+        atualizar_estado_fila(PID_retirado);
+        executar_quantum(PID_retirado);
 
+        printf("Processo terminou? %d\n", processo_terminado(PID_retirado));
+
+        if(processo_terminado(PID_retirado) == 0){
+        adicionar_fila(&fila, PID_retirado);
+        }
+    }
     // Exibe todos os processos atualmente ocupados.
     listar_Processos();
     // Procura e exibe a proxima posicao livre depois das criacoes.

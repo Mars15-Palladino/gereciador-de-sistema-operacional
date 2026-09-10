@@ -66,7 +66,8 @@ void listar_Processos(void);
 // Declara a funcao que finaliza um processo pelo PID.
 int finalizar_Processo(int PID);
 int alterar_estado_do_processo(int PID, EstadoProcesso novo_estado);
-
+int processo_terminado(int PID);
+int quantidade_processos_ativos(void);
 // Encerra a protecao contra inclusao repetida.
 #endif
 
