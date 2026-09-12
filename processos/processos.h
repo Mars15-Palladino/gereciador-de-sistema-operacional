@@ -65,8 +65,11 @@ void criar_Processo(const char *nome, int prioridade, double tempo_total_de_CPU)
 void listar_Processos(void);
 // Declara a funcao que finaliza um processo pelo PID.
 int finalizar_Processo(int PID);
+// Declara a funcao que altera o estado de um processo pelo PID.
 int alterar_estado_do_processo(int PID, EstadoProcesso novo_estado);
+// Declara a funcao que informa se um processo foi terminado.
 int processo_terminado(int PID);
+// Declara a funcao que conta os processos ainda ocupados na tabela.
 int quantidade_processos_ativos(void);
 // Encerra a protecao contra inclusao repetida.
 #endif

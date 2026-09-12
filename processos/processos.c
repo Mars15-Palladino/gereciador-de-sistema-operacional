@@ -150,27 +150,39 @@ int alterar_estado_do_processo(int PID, EstadoProcesso novo_estado){
     // Retorna -1 caso o PID não seja encontrado.
     return -1;
 }
+
+// Verifica se o processo identificado pelo PID ja foi terminado.
 int processo_terminado(int PID){
+    // Percorre a tabela em busca do processo solicitado.
     for(int i = 0; i < MAX_processos; i++){
+        // Compara o PID da posicao atual com o PID recebido.
         if(processos[i].PID == PID){
+            // Retorna um quando o processo esta no estado TERMINADO.
             if(processos[i].estado == TERMINADO){
                 return 1;
             }
 
+            // O processo foi encontrado, mas ainda nao terminou.
             return 0;
         }
     }
 
+    // Retorna -1 quando nao existe processo com esse PID.
     return -1;
 }
 
+// Conta quantos processos permanecem ocupando a tabela.
 int quantidade_processos_ativos(void){
+    // Inicializa o contador de processos ocupados.
     int quantidade = 0;
 
+    // Examina todas as posicoes disponiveis na tabela.
     for(int i = 0;i<MAX_processos;i++){
+        // Soma uma unidade para cada processo ativo encontrado.
         if(processos[i].ocupado){
             quantidade++;
         }
     }
+    // Retorna a quantidade total de processos ativos.
     return quantidade;
 }
