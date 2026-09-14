@@ -4,7 +4,10 @@
 #include "processos/processos.h"
 #include "escalonador/escalonador.h"
 #include "memoria/memoria.h"
-
+#include "relogio/relogio.h"
+#include "arquivos/arquivos.h"
+#include "io/io.h"
+#include "recursos/recursos.h"
 // Funcao principal: e o ponto de entrada da execucao do programa.
 int main(){
     // Cria a fila que armazenara os PIDs dos processos prontos para executar.
@@ -18,43 +21,115 @@ int main(){
     inicializar_Processos();
     // Inicializa a memoria com um unico bloco livre de 1024 KB.
     inicializar_Memoria();
-    // Reserva 200 KB para o processo de PID 1.
-    alocar_Memoria(1, 200);
-    // Reserva 300 KB para o processo de PID 2.
-    alocar_Memoria(2,300);
-    alocar_Memoria(3, 500);
 
-    // Exibe os blocos de memoria depois das alocacoes.
-    printf("Antes de liberar:\n");
-    visualizar_Memoria();
-    int resultado = liberar_Memoria(1);
+    inicializar_Arquivos();
 
-    printf("Resultado da liberacao: %d\n", resultado);
+    inicializar_Relogio();
 
-    printf("Depois de liberar:\n");
-    visualizar_Memoria();
+    inicializar_Recursos();
 
-    resultado = liberar_Memoria(3);
+    visualizar_Recursos();
 
-    printf("Resultado da segunda liberacao: %d\n", resultado);
+    printf("Tempo inicial: %.2f ms\n", obter_Tempo());
 
-    unir_Blocos_Livres();
-    visualizar_Memoria();
+    avancar_Relogio(100);
+    printf("Tempo atual: %.2f ms\n", obter_Tempo());
+
+   if(criar_Arquivo("teste.txt",1)==0){
+    printf("Arquivo criado com sucesso \n");
+   }else{
+    printf("Nao foi possivel criar arquivo");
+   }
+
+   if(abrir_Arquivos("teste.txt", 1) == 0){
+        printf("Arquivo aberto com sucesso\n");
+    }else{
+        printf("Nao foi possivel abrir o arquivo\n");
+    }
+
+    
+
+    if(escrever_Arquivos("teste.txt", 1, "Ola, este e um arquivo de teste.") == 0){
+    printf("Conteudo escrito com sucesso\n");
+    }else{
+        printf("Nao foi possivel escrever no arquivo\n");
+    }
+
+    listar_Arquivos();
+    if(ler_Arquivos("teste.txt", 1) == 0){
+    printf("Arquivo lido com sucesso\n");
+    }else{
+        printf("Nao foi possivel ler o arquivo\n");
+    }
+
+   listar_Arquivos();
+
+   if(fechar_Arquivos("teste.txt", 1) == 0){
+        printf("Arquivo fechado com sucesso\n");
+    }else{
+        printf("Nao foi possivel fechar o arquivo\n");
+    }
+
+     
+
+    if(excluir_Arquivos("teste.txt", 1) == 0){
+    printf("Arquivo excluido com sucesso\n");
+    }else{
+        printf("Nao foi possivel excluir o arquivo\n");
+    }
+    
    
 
+    listar_Arquivos();
+    
 
-
-
-
-
+    
     // Procura e exibe a primeira posicao livre antes das criacoes.
     verificar_Posicao_livre();
+
+    criar_Arquivo("teste.txt", 1);
     // Cria um processo com nome, prioridade e tempo total de CPU definidos.
-    criar_Processo("Processo 1", 5, 500.0);
+    printf("\nSolicitando Impressora para o PID 1...\n");
+
+    if(solicitar_Recurso("Impressora", 1) == 0){
+        printf("Recurso solicitado com sucesso.\n");
+    } else {
+        printf("Nao foi possivel solicitar o recurso.\n");
+    }
+
+visualizar_Recursos();
+listar_Processos();
+
+    criar_Processo("Processo 1", 5, 500.0,200);
     // Cria um segundo processo com os valores informados.
-    criar_Processo("Processo 2", 3, 300.0);
-    // Cria um terceiro processo com os valores informados.\
-    criar_Processo("Processo 3", 8, 700.0);
+    criar_Processo("Processo 2", 3, 300.0,200);
+    // Cria um terceiro processo com os valores informados
+    criar_Processo("Processo 3", 8, 700.0,260);
+
+
+    fechar_Arquivos("teste.txt", 1);
+
+    
+    bloquear_Processo(1);
+
+    printf("\nSolicitando Impressora para o PID 1...\n");
+
+    if(solicitar_Recurso("Impressora", 1) == 0){
+        printf("Recurso solicitado com sucesso.\n");
+    } else {
+        printf("Nao foi possivel solicitar o recurso.\n");
+    }
+
+visualizar_Recursos();
+listar_Processos();
+
+    listar_Processos();
+
+    desbloquear_Processo(1);
+
+    listar_Processos();
+
+
 
     printf("Processos ativos: %d\n", quantidade_processos_ativos());
 
@@ -63,7 +138,7 @@ int main(){
     adicionar_fila(&fila, 2);
     adicionar_fila(&fila, 3);
 
-    
+    /*
     while(quantidade_processos_ativos()>0){
         // Retira o primeiro processo da fila.
         int PID_retirado = remover_fila(&fila);
@@ -76,6 +151,7 @@ int main(){
         atualizar_estado_fila(PID_retirado);
         // Executa o processo durante um quantum do escalonador.
         executar_quantum(PID_retirado);
+        printf("Tempo do sistema: %.2f ms\n", obter_Tempo());
 
         printf("Processo terminou? %d\n", processo_terminado(PID_retirado));
 
@@ -84,11 +160,74 @@ int main(){
         adicionar_fila(&fila, PID_retirado);
         }
     }
+    */
+
+    while(quantidade_processos_ativos() > 0){
+
+        if(obter_Tempo() == 1300.0){
+        printf("Desbloqueando processo PID 2...\n");
+        desbloquear_Processo(2);
+        adicionar_fila(&fila, 2);
+    }
+
+        int PID_retirado = remover_fila(&fila);
+        if(PID_retirado == -1){
+            printf("Fila de prontos vazia.\n");
+            break;
+        }
+
+        printf("PID retirado da fila: %d\n", PID_retirado);
+
+        atualizar_estado_fila(PID_retirado);
+
+        executar_quantum(PID_retirado);
+
+        printf("Tempo do sistema: %.2f ms\n", obter_Tempo());
+
+        printf("Processo terminou? %d\n", processo_terminado(PID_retirado));
+
+       /*
+    * Teste de I/O:
+    * depois que o PID 2 executar seu primeiro quantum,
+    * ele sera bloqueado.
+    */
+    if(PID_retirado == 2 && obter_Tempo() == 300.0){
+        printf("Bloqueando processo PID 2...\n");
+        bloquear_Processo(2);
+    }
+
+    if(processo_terminado(PID_retirado) == 0){
+
+        /*
+        * Somente processos que continuam em EXECUTANDO
+        * retornam para a fila.
+        */
+        for(int i = 0; i < MAX_processos; i++){
+
+            if(processos[i].ocupado && processos[i].PID == PID_retirado){
+
+                if(processos[i].estado == EXECUTANDO){
+                    adicionar_fila(&fila, PID_retirado);
+                }
+
+                break;
+            }
+        }
+    }
+}
+
     // Exibe todos os processos atualmente ocupados.
     listar_Processos();
+
+    printf("Memoria apos finalizar os processos:\n");
+    visualizar_Memoria();
     // Procura e exibe a proxima posicao livre depois das criacoes.
     verificar_Posicao_livre();
     // Aguarda uma tecla para que a janela nao seja encerrada imediatamente.
+
+    
+
+    
     getchar();
     // Informa ao sistema operacional que o programa terminou com sucesso.
     return 0;

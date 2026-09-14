@@ -54,6 +54,10 @@ int alocar_Memoria(int PID, int quantidade){
 
             // Cria um novo bloco livre para a parte que nao foi utilizada.
             if(tamanho_restante > 0 && i+1 < MAX_BLOCOS){
+
+                 for(int j = MAX_BLOCOS - 1; j > i + 1; j--){
+                    blocos[j] = blocos[j - 1];
+                }
                 blocos[i + 1].inicio = blocos[i].inicio + quantidade;
                 blocos[i + 1].tamanho = tamanho_restante;
                 blocos[i + 1].ocupado = false;
@@ -81,14 +85,26 @@ int liberar_Memoria(int PID){
 }
 
 int unir_Blocos_Livres(void){
-     for(int i = 0; i < MAX_BLOCOS - 1; i++){
+    for(int i = 0; i < MAX_BLOCOS - 1; i++){
 
-        if(!blocos[i].ocupado && !blocos[i + 1].ocupado){
-            blocos[i].tamanho += blocos[i + 1].tamanho;
-            blocos[i + 1].tamanho = 0;
+        if(!blocos[i].ocupado && blocos[i].tamanho > 0){
+
+            while(i + 1 < MAX_BLOCOS &&
+                  !blocos[i + 1].ocupado &&
+                  blocos[i + 1].tamanho > 0){
+
+                blocos[i].tamanho += blocos[i + 1].tamanho;
+
+                for(int j = i + 1; j < MAX_BLOCOS - 1; j++){
+                    blocos[j] = blocos[j + 1];
+                }
+
+                blocos[MAX_BLOCOS - 1].tamanho = 0;
+            }
         }
     }
 
     return 0;
-
 }
+
+

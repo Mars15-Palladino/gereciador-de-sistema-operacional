@@ -1,5 +1,6 @@
 #include "escalonador.h"
 #include "../processos/processos.h"
+#include "../relogio/relogio.h"
 
 // Inicializa uma fila circular de processos prontos vazia.
 void inicializar_fila(Fila_escalonador_Prontos *fila){
@@ -44,8 +45,17 @@ int remover_fila(Fila_escalonador_Prontos *fila){
     // Registra a remocao do processo.
     fila->quantidade--;
 
-    // Retorna o PID removido para o chamador.
-    return PID;
+    for(int i = 0; i<MAX_processos; i++){
+        if(processos[i].ocupado && processos[i].PID == PID){
+            if(processos[i].estado != PRONTO){
+                return -1;
+            }
+        return PID;  // Retorna o PID removido para o chamador.
+        }
+       
+    }
+
+    return -1;
 }
 
 // Muda o processo retirado da fila para o estado de execucao.
@@ -61,11 +71,11 @@ int executar_quantum(int PID){
         if(processos[i].ocupado && processos[i].PID == PID){
             // Soma o quantum ao tempo de CPU ja utilizado pelo processo.
             processos[i].tempo_de_cpu_Utilizado += QUANTUN;
-
+            avancar_Relogio(QUANTUN);
+            
             // Finaliza e libera o processo quando seu tempo total foi atingido.
             if(processos[i].tempo_de_cpu_Utilizado>=processos[i].tempo_total_de_CPU){
-                processos[i].estado = TERMINADO;
-                processos[i].ocupado = false;
+               finalizar_Processo(PID);
             }
 
             // Retorna zero para indicar que o processo foi encontrado.

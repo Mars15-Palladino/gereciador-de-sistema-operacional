@@ -10,7 +10,11 @@
                 "${workspaceFolder}\\main.c",
                 "${workspaceFolder}\\processos\\processos.c",
                 "${workspaceFolder}\\escalonador\\escalonador.c",
-                 "${workspaceFolder}\\memoria\\memoria.c",
+                "${workspaceFolder}\\memoria\\memoria.c",
+                "${workspaceFolder}\\relogio\\relogio.c",
+                "${workspaceFolder}\\io\\io.c",
+                "${workspaceFolder}\\arquivos\\arquivos.c",
+                "${workspaceFolder}\\recursos\\recursos.c",
                 "-o",
                 "${workspaceFolder}\\gerenciador.exe"
             ],

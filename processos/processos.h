@@ -7,6 +7,7 @@
 // Disponibiliza o tipo bool e os valores true e false.
 #include <stdbool.h>
 
+
 // Define a quantidade maxima de processos armazenados na tabela.
 #define MAX_processos 250
 // Declara o proximo PID, cuja memoria e reservada em processos.c.
@@ -60,7 +61,7 @@ int inicializar_Processos(void);
 // Declara a funcao que procura uma posicao livre na tabela.
 int verificar_Posicao_livre(void);
 // Declara a funcao que cria um processo com os dados recebidos.
-void criar_Processo(const char *nome, int prioridade, double tempo_total_de_CPU);
+void criar_Processo(const char *nome, int prioridade, double tempo_total_de_CPU, double quantidade_memoria);
 // Declara a funcao que exibe os processos ocupados.
 void listar_Processos(void);
 // Declara a funcao que finaliza um processo pelo PID.
