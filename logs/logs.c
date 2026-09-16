@@ -34,11 +34,11 @@ void registrar_Log(const char *mensagem)
 
 void visualizar_Logs(void)
 {
-    printf("\n===== LOGS DO SISTEMA =====\n");
+    printf("\nLOGS DO SISTEMA\n");
 
     for(int i = 0; i < quantidade_logs; i++){
         printf("%s\n", registros[i]);
     }
 
-    printf("===========================\n");
+    printf("---------------------------\n");
 }

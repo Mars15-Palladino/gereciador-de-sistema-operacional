@@ -41,16 +41,18 @@ int remover_fila(Fila_escalonador_Prontos *fila){
     }
     // Guarda o PID localizado no inicio antes de avancar a fila.
     int PID = fila->PIDs[fila->inicio];
-    // Avanca o inicio de forma circular.
-    fila->inicio = (fila->inicio+1)%TAMANHO_FILA;
-    // Registra a remocao do processo.
-    fila->quantidade--;
-
+    
+    
     for(int i = 0; i<MAX_processos; i++){
         if(processos[i].ocupado && processos[i].PID == PID){
             if(processos[i].estado != PRONTO){
                 return -1;
             }
+            // Avanca o inicio de forma circular.
+            fila->inicio = (fila->inicio+1)%TAMANHO_FILA;
+            // Registra a remocao do processo.
+            fila->quantidade--;
+
         return PID;  // Retorna o PID removido para o chamador.
         }
        

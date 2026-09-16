@@ -29,5 +29,6 @@ int ler_Arquivos(const char *nome, int PID);
 int excluir_Arquivos(const char *nome, int PID);
 int listar_Arquivos(void);
 int quantidade_Arquivos(void);
+void liberar_Arquivos_do_Processo(int PID);
 
 #endif

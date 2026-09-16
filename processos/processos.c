@@ -4,6 +4,8 @@
 #include <string.h>
 #include "../memoria/memoria.h"
 #include "../logs/logs.h"
+#include "../recursos/recursos.h"
+#include "../arquivos/arquivos.h"
 
 // Define o primeiro PID que sera atribuido a um processo.
 int proximo_PID = 1;
@@ -27,17 +29,10 @@ int verificar_Posicao_livre(void){
     for(int i = 0; i < MAX_processos; i++){
         // Verifica se a posicao atual nao esta ocupada.
         if(!processos[i].ocupado){
-            // Informa ao usuario qual posicao livre foi encontrada.
-            printf("Posicao livre encontrada: %d\n", i);
-            // Imprime uma linha separadora para facilitar a leitura.
-            printf("--------------------------------------------------\n");
             // Retorna o indice da posicao livre encontrada.
             return i;
         }
     }
-    // Informa que a tabela esta cheia.
-    printf("Nenhuma posicao livre encontrada.\n");
-    // Retorna -1 para indicar que nenhuma posicao foi encontrada.
     return -1;
 }
 
@@ -48,12 +43,12 @@ void criar_Processo(const char *nome, int prioridade, double tempo_total_de_CPU,
     // Verifica se a tabela esta cheia.
     if(posicao_livre == -1){
         // Informa que o processo nao pode ser criado.
-        printf("Nao ha posicao livre para criar o processo.\n");
+        printf("Nao ha posicao livre para criar o processo\n");
         // Encerra a funcao sem alterar a tabela.
         return;
     }   
     if(alocar_Memoria(proximo_PID, quantidade_memoria) != 0){
-    printf("Nao foi possivel alocar memoria para o processo.\n");
+    printf("[ERRO] Nao foi possivel alocar memoria para o processo\n");
     return;
     }
 
@@ -96,35 +91,47 @@ void criar_Processo(const char *nome, int prioridade, double tempo_total_de_CPU,
 
 
 }
+const char *nome_Estado(EstadoProcesso estado)
+{
+    switch(estado)
+    {
+        case NOVO:
+            return "NOVO";
 
-// Exibe os dados de todos os processos ocupados.
+        case PRONTO:
+            return "PRONTO";
+
+        case EXECUTANDO:
+            return "EXECUTANDO";
+
+        case BLOQUEADO:
+            return "BLOQUEADO";
+
+        case TERMINADO:
+            return "TERMINADO";
+
+        default:
+            return "DESCONHECIDO";
+    }
+}
+
+
+// Exibe os dados de todos os processos ocupados em formato tabular.
 void listar_Processos(void){
-    // Imprime o titulo da listagem.
-    printf("Lista de Processos:\n");
-    // Percorre todas as posicoes da tabela.
+    printf("\nPID  NOME           PRIOR  ESTADO       CPU     MEMORIA  RECURSOS  ARQUIVOS\n");
+    printf("--------------------------------------------------------------------------\n");
+
     for(int i = 0; i < MAX_processos; i++){
-        // Exibe somente as posicoes que possuem um processo ativo.
         if(processos[i].ocupado){
-            // Imprime os principais dados do processo atual.
-            printf("PID: %d, NOME: %s, Prioridade: %d, Estado: %d, Tempo Total de CPU: %.2f, Tempo de CPU utilizado: %.2f, Quatidade de Memoria Alocada: %.2f, Recursos Associados: %d, Arquivos Abertos: %d\n",
-                // Envia o PID para o primeiro marcador da mensagem.
-                processos[i].PID,
-                // Envia o nome para o marcador de texto correspondente.
-                processos[i].NOME,
-                // Envia a prioridade para a mensagem.
-                processos[i].prioridade,
-                // Envia o estado numerico para a mensagem.
-                processos[i].estado,
-                // Envia o tempo total de CPU para a mensagem.
-                processos[i].tempo_total_de_CPU,
-                // Envia o tempo de CPU ja utilizado.
-                processos[i].tempo_de_cpu_Utilizado,
-                // Envia a quantidade de memoria alocada.
-                processos[i].quantidade_memoria_alocada,
-                // Envia a quantidade de recursos associados.
-                processos[i].recursos_associados,
-                // Envia a quantidade de arquivos abertos.
-                processos[i].arquivos_abertos);
+            printf("%-4d %-14s %-6d %-12s %-7.2f %-8.0f %-9d %-8d\n",
+                   processos[i].PID,
+                   processos[i].NOME,
+                   processos[i].prioridade,
+                   nome_Estado(processos[i].estado),
+                   processos[i].tempo_de_cpu_Utilizado,
+                   processos[i].quantidade_memoria_alocada,
+                   processos[i].recursos_associados,
+                   processos[i].arquivos_abertos);
         }
     }
 }
@@ -135,34 +142,32 @@ int finalizar_Processo(int PID){
     for(int i = 0; i < MAX_processos; i++){
         // Confirma que a posicao esta ocupada e possui o PID procurado.
         if(processos[i].ocupado && processos[i].PID == PID){
+            // Libera a memoria usada pelo processo e reorganiza os blocos livres.
             liberar_Memoria(PID);
             unir_Blocos_Livres();
-            int resultado_memoria = liberar_Memoria(PID);
 
-            unir_Blocos_Livres();
+            liberar_Arquivos_do_Processo(PID);
+            liberar_Recursos_do_Processo(PID);
 
             processos[i].estado = TERMINADO;
             processos[i].ocupado = false;
 
-            printf("Processo com PID %d finalizado e posicao liberada.\n", PID);
-            printf("--------------------------------------------------\n");
-
             char mensagem[200];
 
-    snprintf(
-        mensagem,
-        sizeof(mensagem),
-        "Processo PID %d finalizado",
-        PID);
+            snprintf(
+                mensagem,
+                sizeof(mensagem),
+                "Processo PID %d finalizado",
+                PID
+            );
 
-    registrar_Log(mensagem);
+            registrar_Log(mensagem);
 
-           
             return 0;
         }
     }
     // Informa que nenhum processo possui o PID informado.
-    printf("Processo com PID %d nao encontrado.\n", PID);
+    printf("Processo com PID %d nao encontrado\n", PID);
     // Retorna -1 para indicar que a finalizacao nao foi realizada.
     return -1;
 }

@@ -20,23 +20,26 @@ int inicializar_Memoria(void){
     return 0;
 } 
 
-// Exibe todos os blocos de memoria que possuem tamanho valido.
+// Exibe todos os blocos de memoria em formato tabular.
 int visualizar_Memoria(){
-    // Percorre o vetor de blocos para mostrar seu estado atual.
-    for(int i = 0; i < MAX_BLOCOS; i++){
-    // Blocos com tamanho zero nao representam memoria disponivel ou alocada.
-    if(blocos[i].tamanho > 0){
-        printf("Bloco: %d\n", i);
-        printf("Inicio: %d KB\n", blocos[i].inicio);
-        printf("Tamanho: %d KB\n", blocos[i].tamanho);
-        printf("Ocupado: %s\n", blocos[i].ocupado ? "Sim" : "Nao");
-        printf("PID: %d\n", blocos[i].PID);
-        printf("-----------------------------\n");
-    }
-}
-    // Retorna zero para indicar que a visualizacao foi concluida.
-    return 0;
+    printf("\nBLOCO  INICIO  TAMANHO  STATUS      PID\n");
+    printf("------------------------------------------\n");
 
+    for(int i = 0; i < MAX_BLOCOS; i++){
+        if(blocos[i].tamanho > 0){
+            const char *status = blocos[i].ocupado ? "OCUPADO" : "LIVRE";
+            int pid = blocos[i].ocupado ? blocos[i].PID : -1;
+
+            printf("%-5d %-7d %-9d %-12s %-3d\n",
+                   i,
+                   blocos[i].inicio,
+                   blocos[i].tamanho,
+                   status,
+                   pid);
+        }
+    }
+
+    return 0;
 }
 
 // Procura um bloco livre e reserva nele a quantidade solicitada de memoria.

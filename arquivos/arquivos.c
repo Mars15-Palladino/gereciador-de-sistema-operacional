@@ -18,6 +18,14 @@ int inicializar_Arquivos(void)
 
 int criar_Arquivo(const char *nome, int PID){
     for(int i = 0; i < MAX_ARQUIVOS; i++){
+        if(arquivos[i].ocupado &&
+        strcmp(arquivos[i].nome, nome) == 0){
+            return -1;
+        }
+    }
+
+
+    for(int i = 0; i < MAX_ARQUIVOS; i++){
         if(!arquivos[i].ocupado){
             strncpy(arquivos[i].nome, nome, TAMANHO_NOME_ARQUIVO-1);
             arquivos[i].nome[TAMANHO_NOME_ARQUIVO-1] = '\0';
@@ -44,35 +52,42 @@ int criar_Arquivo(const char *nome, int PID){
     return -1;
 }
 int abrir_Arquivos(const char *nome, int PID){
+    // Procura o arquivo pelo nome e valida se o processo pode acessá-lo.
     for(int i = 0; i < MAX_ARQUIVOS; i++){
-
         if(arquivos[i].ocupado &&
            strcmp(arquivos[i].nome, nome) == 0){
 
-                if(arquivos[i].PID_proprietario != PID){
-                    return -1;
-                }
+            if(arquivos[i].PID_proprietario != PID){
+                return -1;
+            }
 
-                if(arquivos[i].aberto){
-                    return -1;
-                }
+            if(arquivos[i].aberto){
+                return -1;
+            }
 
-                arquivos[i].aberto = true;
+            arquivos[i].aberto = true;
 
-                for(int j = 0; j < MAX_processos; j++){
+            // Atualiza a contagem de arquivos abertos do processo quando a operação é permitida.
+            for(int j = 0; j < MAX_processos; j++){
                 if(processos[j].ocupado && processos[j].PID == PID){
                     processos[j].arquivos_abertos++;
 
+                    /*
+                    Trecho de diagnóstico mantido comentado para consultas futuras.
+                    Desativado em produção para evitar ruído de saída.
+                    */
 
                     char mensagem[200];
 
                     snprintf(
                         mensagem,
                         sizeof(mensagem),
-                        "Arquivo '%s' aberto pelo processo PID %d",arquivos[i].nome,PID);
+                        "Arquivo '%s' aberto pelo processo PID %d",
+                        arquivos[i].nome,
+                        PID
+                    );
 
                     registrar_Log(mensagem);
-
                     break;
                 }
             }
@@ -82,66 +97,55 @@ int abrir_Arquivos(const char *nome, int PID){
 
     return -1;
 }
+
 int fechar_Arquivos(const char *nome, int PID){
-
-    printf("DEBUG: nome recebido = [%s]\n", nome);
- for(int i = 0; i < MAX_ARQUIVOS; i++){
-
-        printf("DEBUG: ocupado=%d | strcmp=%d\n",
-       arquivos[i].ocupado,
-       strcmp(arquivos[i].nome, nome));/**/
+    // Busca o arquivo informado e valida a permissão do processo antes de fechar o acesso.
+    for(int i = 0; i < MAX_ARQUIVOS; i++){
+        /*
+        Trecho de diagnóstico anterior removido para manter a saída do sistema limpa.
+        */
 
         if(arquivos[i].ocupado &&
            strcmp(arquivos[i].nome, nome) == 0){
-            printf("DEBUG: ENTREI NO IF DO ARQUIVO\n");
-
-
-                    printf("DEBUG: PID proprietario=%d | PID recebido=%d | aberto=%d\n",
-            arquivos[i].PID_proprietario,
-            PID,
-            arquivos[i].aberto);
+            /*
+            Verificação de compatibilidade do proprietário e do estado do arquivo.
+            */
 
             if(arquivos[i].PID_proprietario != PID){
-                printf("DEBUG: PID proprietario diferente\n");
                 return -1;
             }
 
             if(!arquivos[i].aberto){
-                 printf("DEBUG: arquivo ja esta fechado\n");
                 return -1;
             }
 
-                arquivos[i].aberto = false;
-                printf("DEBUG: arquivo marcado como fechado\n");
+            arquivos[i].aberto = false;
 
+            char mensagem[200];
 
-                char mensagem[200];
+            snprintf(
+                mensagem,
+                sizeof(mensagem),
+                "Arquivo '%s' fechado pelo processo PID %d",
+                arquivos[i].nome,
+                PID
+            );
 
-                snprintf(
-                    mensagem,
-                    sizeof(mensagem),
-                    "Arquivo '%s' fechado pelo processo PID %d",
-                    arquivos[i].nome,
-                    PID
-                );
-                printf("DEBUG: antes do registrar_Log\n");
-                registrar_Log(mensagem);
-                printf("DEBUG: depois do registrar_Log\n");
+            registrar_Log(mensagem);
 
-                for(int j = 0; j < MAX_processos; j++){
-                    if(processos[j].ocupado && processos[j].PID == PID){
-                        if(processos[j].arquivos_abertos > 0){
-                            processos[j].arquivos_abertos--;
-                        }
-                        break;
+            for(int j = 0; j < MAX_processos; j++){
+                if(processos[j].ocupado && processos[j].PID == PID){
+                    if(processos[j].arquivos_abertos > 0){
+                        processos[j].arquivos_abertos--;
                     }
-                }   
-                printf("DEBUG: chegando ao return 0\n");
-                return 0;
+                    break;
+                }
             }
-        }
 
-    printf("DEBUG: arquivo nao encontrado\n");
+            return 0;
+        }
+    }
+
     return -1;
 }
     
@@ -185,6 +189,7 @@ int escrever_Arquivos(const char *nome, int PID, const char *conteudo){
     return -1;
 }
 int ler_Arquivos(const char *nome, int PID){
+    // Valida o acesso e exibe o conteúdo apenas se o arquivo estiver aberto e pertencente ao PID correto.
     for(int i = 0; i< MAX_ARQUIVOS; i++){
         if(arquivos[i].ocupado && strcmp(arquivos[i].nome, nome)==0){
              if(arquivos[i].PID_proprietario != PID){
@@ -195,7 +200,7 @@ int ler_Arquivos(const char *nome, int PID){
                 return -1;
             }
 
-            printf("Conteudo do arquivo: %s\n", arquivos[i].conteudo);
+            printf("Conteudo do arquivo %s\n", arquivos[i].conteudo);
 
             char mensagem[200];
 
@@ -215,16 +220,18 @@ int ler_Arquivos(const char *nome, int PID){
 
     return -1;
 }
+
 int listar_Arquivos(void){
-    printf("Arquivos Listados\n");
+    // Exibe todos os arquivos ativos, com o estado de abertura, proprietário e conteúdo atual.
+    printf("Arquivos listados\n");
     for(int i = 0; i< MAX_ARQUIVOS; i++){
         if(arquivos[i].ocupado){
-            printf("Nome: %s\n", arquivos[i].nome);
-            printf("Tamanho: %d bytes\n", arquivos[i].tamanho);
-            printf("Aberto: %s\n", arquivos[i].aberto ? "Sim" : "Nao");// um if encurtado, serve para operações mais simples
-            printf("PID proprietario: %d\n", arquivos[i].PID_proprietario);
-            printf("Conteudo: %s\n", arquivos[i].conteudo);
-            printf("Data de criacao: %.2f ms\n\n", arquivos[i].data_criacao);
+            printf("Nome %s\n", arquivos[i].nome);
+            printf("Tamanho %d bytes\n", arquivos[i].tamanho);
+            printf("Aberto %s\n", arquivos[i].aberto ? "Sim" : "Nao");
+            printf("PID proprietario %d\n", arquivos[i].PID_proprietario);
+            printf("Conteudo %s\n", arquivos[i].conteudo);
+            printf("Data de criacao %.2f ms\n\n", arquivos[i].data_criacao);
             printf("----------------------------------\n");
         }
     }
@@ -277,4 +284,22 @@ int quantidade_Arquivos(void){
     }
 
     return quantidade;
+}
+void liberar_Arquivos_do_Processo(int PID)
+{
+    for(int i = 0; i < MAX_ARQUIVOS; i++){
+        if(arquivos[i].ocupado &&
+           arquivos[i].PID_proprietario == PID &&
+           arquivos[i].aberto){
+
+            arquivos[i].aberto = false;
+        }
+    }
+
+    for(int i = 0; i < MAX_processos; i++){
+        if(processos[i].ocupado && processos[i].PID == PID){
+            processos[i].arquivos_abertos = 0;
+            break;
+        }
+    }
 }

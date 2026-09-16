@@ -62,6 +62,8 @@ int inicializar_Processos(void);
 int verificar_Posicao_livre(void);
 // Declara a funcao que cria um processo com os dados recebidos.
 void criar_Processo(const char *nome, int prioridade, double tempo_total_de_CPU, double quantidade_memoria);
+// Declara a funcao que converte um estado em texto legivel.
+const char *nome_Estado(EstadoProcesso estado);
 // Declara a funcao que exibe os processos ocupados.
 void listar_Processos(void);
 // Declara a funcao que finaliza um processo pelo PID.

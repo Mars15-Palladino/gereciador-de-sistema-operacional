@@ -23,12 +23,12 @@ int inicializar_Recursos(void)
 }
 int visualizar_Recursos(void)
 {
-    printf("Lista de Recursos:\n");
+    printf("Lista de Recursos\n");
 
     for(int i = 0; i < MAX_RECURSOS; i++){
-        printf("Recurso: %s\n", recursos[i].nome);
-        printf("Ocupado: %s\n", recursos[i].ocupado ? "Sim" : "Nao");
-        printf("PID: %d\n", recursos[i].PID);
+        printf("Recurso %s\n", recursos[i].nome);
+        printf("Ocupado %s\n", recursos[i].ocupado ? "Sim" : "Nao");
+        printf("PID %d\n", recursos[i].PID);
         printf("-----------------------------\n");
     }
 
@@ -114,4 +114,20 @@ int liberar_Recurso(const char *nome, int PID)
 
     /* Recurso não encontrado */
     return -1;
+}
+void liberar_Recursos_do_Processo(int PID)
+{
+    for(int i = 0; i < MAX_RECURSOS; i++){
+        if(recursos[i].ocupado && recursos[i].PID == PID){
+            recursos[i].ocupado = false;
+            recursos[i].PID = -1;
+        }
+    }
+
+    for(int i = 0; i < MAX_processos; i++){
+        if(processos[i].ocupado && processos[i].PID == PID){
+            processos[i].recursos_associados = 0;
+            break;
+        }
+    }
 }
