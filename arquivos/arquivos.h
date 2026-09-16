@@ -28,6 +28,6 @@ int escrever_Arquivos(const char *nome, int PID, const char *conteudo);
 int ler_Arquivos(const char *nome, int PID);
 int excluir_Arquivos(const char *nome, int PID);
 int listar_Arquivos(void);
-
+int quantidade_Arquivos(void);
 
 #endif

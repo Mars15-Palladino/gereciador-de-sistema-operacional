@@ -29,5 +29,6 @@ int alocar_Memoria(int PID, int quantidade);
 
 int liberar_Memoria(int PID);
 int unir_Blocos_Livres(void);
+int memoria_Utilizada(void);
 
 #endif

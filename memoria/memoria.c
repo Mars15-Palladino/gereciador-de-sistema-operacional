@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "memoria.h"
+#include "../logs/logs.h"
 
 // Mantem os blocos de memoria gerenciados pelo sistema.
 BlocoMemoria blocos[MAX_BLOCOS];
@@ -42,7 +43,7 @@ int visualizar_Memoria(){
 int alocar_Memoria(int PID, int quantidade){
     // Percorre os blocos em busca do primeiro espaco suficiente.
     for(int i = 0;i<MAX_BLOCOS;i++){
-         if(!blocos[i].ocupado && blocos[i].tamanho >= quantidade){
+        if(!blocos[i].ocupado && blocos[i].tamanho >= quantidade){
 
             // Calcula quanto permanecera livre depois da reserva.
             int tamanho_restante = blocos[i].tamanho - quantidade;
@@ -63,6 +64,15 @@ int alocar_Memoria(int PID, int quantidade){
                 blocos[i + 1].ocupado = false;
                 blocos[i + 1].PID = -1;
             }
+                char mensagem[200];
+
+            snprintf(
+                mensagem,
+                sizeof(mensagem),
+                "Memoria de %d KB alocada para o processo PID %d",quantidade,PID);
+
+            registrar_Log(mensagem);
+
             // Retorna zero para indicar que a alocacao foi realizada.
             return 0;
             
@@ -72,11 +82,23 @@ int alocar_Memoria(int PID, int quantidade){
     // Retorna -1 quando nao existe bloco livre com tamanho suficiente.
     return -1;
 }
+
 int liberar_Memoria(int PID){
     for(int i = 0; i < MAX_BLOCOS; i++){
         if(blocos[i].ocupado && blocos[i].PID == PID){
             blocos[i].ocupado = false;
             blocos[i].PID = -1;
+
+
+             char mensagem[200];
+
+            snprintf(
+                mensagem,
+                sizeof(mensagem),
+                "Memoria liberada para o processo PID %d",PID);
+
+            registrar_Log(mensagem);
+
 
             return 0;
         }
@@ -106,5 +128,17 @@ int unir_Blocos_Livres(void){
 
     return 0;
 }
+int memoria_Utilizada(void){
+    int quantidade = 0;
+
+    for(int i = 0; i < MAX_BLOCOS; i++){
+        if(blocos[i].ocupado){
+            quantidade += blocos[i].tamanho;
+        }
+    }
+
+    return quantidade;
+}
+
 
 

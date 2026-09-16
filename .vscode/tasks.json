@@ -15,6 +15,9 @@
                 "${workspaceFolder}\\io\\io.c",
                 "${workspaceFolder}\\arquivos\\arquivos.c",
                 "${workspaceFolder}\\recursos\\recursos.c",
+                "${workspaceFolder}\\semaforos\\semaforos.c",
+                "${workspaceFolder}\\logs\\logs.c",
+                "${workspaceFolder}\\estatistica\\estatistica.c",
                 "-o",
                 "${workspaceFolder}\\gerenciador.exe"
             ],

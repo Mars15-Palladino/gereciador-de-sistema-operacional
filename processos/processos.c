@@ -3,6 +3,7 @@
 // Inclui strncpy, usada para copiar o nome com limite de tamanho.
 #include <string.h>
 #include "../memoria/memoria.h"
+#include "../logs/logs.h"
 
 // Define o primeiro PID que sera atribuido a um processo.
 int proximo_PID = 1;
@@ -50,15 +51,20 @@ void criar_Processo(const char *nome, int prioridade, double tempo_total_de_CPU,
         printf("Nao ha posicao livre para criar o processo.\n");
         // Encerra a funcao sem alterar a tabela.
         return;
-    }
-    // Marca a posicao escolhida como ocupada.
-    processos[posicao_livre].ocupado = true;
-    // Atribui o PID atual e incrementa o proximo PID disponivel.
-    processos[posicao_livre].PID = proximo_PID++;
-    if(alocar_Memoria(processos[posicao_livre].PID, quantidade_memoria) != 0){
+    }   
+    if(alocar_Memoria(proximo_PID, quantidade_memoria) != 0){
     printf("Nao foi possivel alocar memoria para o processo.\n");
     return;
     }
+
+    // Marca a posicao escolhida como ocupada.
+    processos[posicao_livre].ocupado = true;
+
+    // Atribui o PID atual e incrementa o proximo PID disponivel.
+    processos[posicao_livre].PID = proximo_PID++;
+
+
+
     // Define o estado inicial do processo como NOVO.
     processos[posicao_livre].estado = NOVO;
     // Copia o nome sem ultrapassar o tamanho reservado no campo NOME.
@@ -77,6 +83,18 @@ void criar_Processo(const char *nome, int prioridade, double tempo_total_de_CPU,
     processos[posicao_livre].recursos_associados = 0;
     // Inicia a quantidade de arquivos abertos em zero.
     processos[posicao_livre].arquivos_abertos = 0;
+
+    char mensagem[200];
+
+    snprintf(
+        mensagem,
+        sizeof(mensagem),
+        "Processo PID %d criado",
+        processos[posicao_livre].PID);
+
+    registrar_Log(mensagem);
+
+
 }
 
 // Exibe os dados de todos os processos ocupados.
@@ -117,7 +135,10 @@ int finalizar_Processo(int PID){
     for(int i = 0; i < MAX_processos; i++){
         // Confirma que a posicao esta ocupada e possui o PID procurado.
         if(processos[i].ocupado && processos[i].PID == PID){
-              liberar_Memoria(PID);
+            liberar_Memoria(PID);
+            unir_Blocos_Livres();
+            int resultado_memoria = liberar_Memoria(PID);
+
             unir_Blocos_Livres();
 
             processos[i].estado = TERMINADO;
@@ -125,6 +146,16 @@ int finalizar_Processo(int PID){
 
             printf("Processo com PID %d finalizado e posicao liberada.\n", PID);
             printf("--------------------------------------------------\n");
+
+            char mensagem[200];
+
+    snprintf(
+        mensagem,
+        sizeof(mensagem),
+        "Processo PID %d finalizado",
+        PID);
+
+    registrar_Log(mensagem);
 
            
             return 0;

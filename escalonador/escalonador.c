@@ -1,6 +1,7 @@
 #include "escalonador.h"
 #include "../processos/processos.h"
 #include "../relogio/relogio.h"
+#include "../logs/logs.h"
 
 // Inicializa uma fila circular de processos prontos vazia.
 void inicializar_fila(Fila_escalonador_Prontos *fila){
@@ -63,7 +64,7 @@ int atualizar_estado_fila(int PID){
     return alterar_estado_do_processo(PID, EXECUTANDO);
 }
 
-// Executa um processo durante um quantum de tempo da CPU.
+// Executa um processo durante um quantum de tempo da CPU. Tempo que um preocesso pode usar a CPU antes de o escalonador dar a vez para outro processo.
 int executar_quantum(int PID){
     // Procura na tabela o processo correspondente ao PID recebido.
     for(int i = 0; i<MAX_processos;i++){
@@ -72,6 +73,16 @@ int executar_quantum(int PID){
             // Soma o quantum ao tempo de CPU ja utilizado pelo processo.
             processos[i].tempo_de_cpu_Utilizado += QUANTUN;
             avancar_Relogio(QUANTUN);
+
+            char mensagem[200];
+
+            snprintf(
+                mensagem,
+                sizeof(mensagem),
+                "Processo PID %d executou por %.2f ms",PID,QUANTUN);
+
+            registrar_Log(mensagem);
+
             
             // Finaliza e libera o processo quando seu tempo total foi atingido.
             if(processos[i].tempo_de_cpu_Utilizado>=processos[i].tempo_total_de_CPU){

@@ -17,4 +17,6 @@ int inicializar_Recursos(void);
 int visualizar_Recursos(void);
 int solicitar_Recurso(const char *nome, int PID);
 
+int liberar_Recurso(const char *nome, int PID);
+
 #endif

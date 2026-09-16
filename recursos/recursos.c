@@ -78,3 +78,40 @@ int solicitar_Recurso(const char *nome, int PID)
     /* Recurso não encontrado */
     return -1;
 }
+
+int liberar_Recurso(const char *nome, int PID)
+{
+    for(int i = 0; i < MAX_RECURSOS; i++){
+        if(strcmp(recursos[i].nome, nome) == 0){
+
+            /* Verifica se o recurso está ocupado */
+            if(!recursos[i].ocupado){
+                return -1;
+            }
+
+            /* Verifica se pertence ao processo */
+            if(recursos[i].PID != PID){
+                return -1;
+            }
+
+            /* Libera o recurso */
+            recursos[i].ocupado = false;
+            recursos[i].PID = -1;
+
+            /* Atualiza o PCB */
+            for(int j = 0; j < MAX_processos; j++){
+                if(processos[j].ocupado && processos[j].PID == PID){
+                    if(processos[j].recursos_associados > 0){
+                        processos[j].recursos_associados--;
+                    }
+                    break;
+                }
+            }
+
+            return 0;
+        }
+    }
+
+    /* Recurso não encontrado */
+    return -1;
+}
